@@ -1,4 +1,4 @@
-# fiix-analytics-auto-downloader
+Auto Downloader for Fiix Analytics Workflows
 
 A lightweight PowerShell script that automatically downloads scheduled Fiix Analytics (Looker) PDF reports from email and saves them to a local or shared drive. No browser interaction, no external modules, no dependencies beyond PowerShell 5.1+.
 
