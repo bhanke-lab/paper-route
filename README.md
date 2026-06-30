@@ -134,8 +134,10 @@ powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:KioskShow-Pd
 ```
 
 The kiosk runs in its own Edge profile, so it never touches anyone else's browsing tabs on the same machine.
-This was originally built with SumatraPDF, but was de-scaled to Edge in order to reduce GPU requirements on startup
-and decrease hanging time. Reach out if you would like the Sumatra version.
+
+This was originally built with SumatraPDF, but was rolled back to Edge. This is due to Sumatra not being DPI-aware, and
+this project aiming to fit pdfs on high-dpi portait or landscape displays when needed (TVs). This project's framework can
+be easily reworked back into Sumatra.
 
 ## Output
 
