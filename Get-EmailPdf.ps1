@@ -1,24 +1,26 @@
 # ============================================================
-# FiixAnalyticsDownloader.ps1
+# Get-EmailPdf.ps1  (PaperRoute)
 #
-# Downloads the daily Fiix Analytics PDF from Gmail via IMAP
-# and saves it to a shared network drive. No external modules.
+# Downloads the latest scheduled PDF report from a Gmail inbox
+# via raw IMAP/TLS and saves it to a local or shared folder.
+# No external modules, no browser automation.
 #
 # Author: Bennett Hanke
 # License: MIT
 # ============================================================
 
-# Configuration
-$gmailUser     = "your-email@gmail.com"
-$gmailAppPass  = "xxxx xxxx xxxx xxxx"           # Gmail App Password — see README
-$fiixSender    = "noreply@lookermail.com"
+# ---- Configuration -----------------------------------------
+$gmailUser = "your-email@gmail.com"
+$gmailAppPass = "xxxx xxxx xxxx xxxx"          # Gmail App Password, see README
+$fromAddress = "reports@example.com"           # Sender to match (e.g. noreply@lookermail.com for Looker / Fiix Analytics)
+$subjectFilter = "Your Report Name"            # Must match the email subject line
 
-# Settings
-$subjectFilter = "Owego WO Shift Turnover"
-$savePath      = "Z:\"
-$imapServer    = "imap.gmail.com"
-$imapPort      = 993
-$logFile       = "C:\Scripts\FiixReport.log"
+# ---- Settings ----------------------------------------------
+$savePath = "Z:\"                          # Target folder (local, mapped drive, or UNC)
+$filePrefix = "REPORT"                     # Saved filename prefix
+$imapServer = "imap.gmail.com"
+$imapPort = 993
+$logFile = "C:\Scripts\PaperRoute.log"
 
 # Logging
 function Write-Log($msg) {
@@ -84,7 +86,8 @@ function Extract-PdfFromMime($emailText) {
         }
         Write-Log "WARNING: Decoded bytes don't start with PDF header, saving anyway."
         return $bytes
-    } catch {
+    }
+    catch {
         Write-Log "Base64 decode failed: $_"
         return $null
     }
@@ -92,7 +95,7 @@ function Extract-PdfFromMime($emailText) {
 
 # Main
 try {
-    Write-Log "Starting Fiix report download..."
+    Write-Log "Starting report download..."
 
     $tcp = New-Object System.Net.Sockets.TcpClient($imapServer, $imapPort)
     $ssl = New-Object System.Net.Security.SslStream($tcp.GetStream(), $false)
@@ -116,7 +119,7 @@ try {
 
     # Search for today's unread report
     $today = (Get-Date).ToString("dd-MMM-yyyy")
-    $writer.WriteLine("a3 SEARCH UNSEEN FROM `"$fiixSender`" SUBJECT `"$subjectFilter`" SINCE $today")
+    $writer.WriteLine("a3 SEARCH UNSEEN FROM `"$fromAddress`" SUBJECT `"$subjectFilter`" SINCE $today")
     $searchResult = ""
     do {
         $line = $reader.ReadLine()
@@ -151,8 +154,9 @@ try {
 
     if ($null -eq $pdfBytes) {
         Write-Log "WARNING: No PDF attachment could be extracted from the email."
-    } else {
-        $fileName = "WOTURNOVER_" + (Get-Date).ToString("MM-dd-yyyy") + "_" + (Get-Date).ToString("%h") + (Get-Date).ToString("tt").ToUpper() + ".pdf"
+    }
+    else {
+        $fileName = $filePrefix + "_" + (Get-Date).ToString("MM-dd-yyyy") + "_" + (Get-Date).ToString("%h") + (Get-Date).ToString("tt").ToUpper() + ".pdf"
         $filePath = Join-Path $savePath $fileName
 
         [System.IO.File]::WriteAllBytes($filePath, $pdfBytes)
@@ -169,6 +173,7 @@ try {
     $reader.Close(); $writer.Close(); $ssl.Close(); $tcp.Close()
     Write-Log "Done."
 
-} catch {
+}
+catch {
     Write-Log "ERROR: $_"
 }
