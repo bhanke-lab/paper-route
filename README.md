@@ -9,7 +9,7 @@ It is two small scripts you can use together or on their own:
 
 ## Why This Exists
 
-PaperRoute was originally built to put daily Fiix Analytics (Google Looker BI) shift-turnover reports on a maintenance-bay TV: a scheduled Looker email each morning, auto-saved to a shared drive, auto-displayed fullscreen on a wall-mounted screen. There is no built-in way to get a scheduled BI email onto a folder or a screen without a person in the loop, so this closes that gap.
+PaperRoute was originally built to put multi-period Fiix Analytics (Google Looker BI) shift-turnover reports on a maintenance-bay TV: a scheduled Looker email each morning, auto-saved to a shared drive, auto-displayed fullscreen on a wall-mounted screen. There is no built-in way to get a scheduled BI email onto a folder or a screen without a person in the loop, so this closes that gap.
 
 None of it is Fiix-specific. Any recurring email-to-PDF delivery works the same way:
 
@@ -18,7 +18,7 @@ None of it is Fiix-specific. Any recurring email-to-PDF delivery works the same 
 - Monitoring, safety, or compliance exports
 - Invoices, statements, or any recurring PDF that lands in an inbox
 
-Use the downloader alone if you just want files on a drive. Add the kiosk script when you want them on a screen.
+Use the downloader alone if you just want files on a drive for easy and stable reference. Add the kiosk script when you want them on a screen for real-time reporting.
 
 ## How It Works
 
@@ -134,6 +134,8 @@ powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:KioskShow-Pd
 ```
 
 The kiosk runs in its own Edge profile, so it never touches anyone else's browsing tabs on the same machine.
+This was originally built with SumatraPDF, but was de-scaled to Edge in order to reduce GPU requirements on startup
+and decrease hanging time. Reach out if you would like the Sumatra version.
 
 ## Output
 
